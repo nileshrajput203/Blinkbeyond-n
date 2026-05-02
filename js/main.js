@@ -6,10 +6,35 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Premium Branded Splash Screen ──
   const loader = document.getElementById('page-loader');
   if (loader) {
-    // Show only once per session
-    if (sessionStorage.getItem('bb_loader_seen')) {
+    const docEl = document.documentElement;
+    const getCookieSeen = () => /(?:^|; )bb_loader_seen=1/.test(document.cookie);
+    const getSeenFlag = () => {
+      if (docEl.classList.contains('bb-loader-skip')) return true;
+      try {
+        if (localStorage.getItem('bb_loader_seen') === '1') return true;
+      } catch (e) {}
+      if (getCookieSeen()) return true;
+      try {
+        return sessionStorage.getItem('bb_loader_seen') === '1';
+      } catch (e) {
+        return false;
+      }
+    };
+    const setSeenFlag = () => {
+      try {
+        localStorage.setItem('bb_loader_seen', '1');
+      } catch (e) {}
+      document.cookie = 'bb_loader_seen=1; path=/; max-age=31536000';
+      try {
+        sessionStorage.setItem('bb_loader_seen', '1');
+      } catch (e) {}
+    };
+
+    if (getSeenFlag()) {
       loader.classList.add('skip');
+      loader.remove();
     } else {
+      setSeenFlag();
       const counterEl = document.getElementById('loader-percent');
       const barFill = document.getElementById('loader-bar-fill');
       const fillText = document.getElementById('loader-fill-text');
@@ -49,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
           // Done — slide loader out after a brief pause
           setTimeout(() => {
             loader.classList.add('hidden');
-            sessionStorage.setItem('bb_loader_seen', '1');
             // Remove from DOM after transition
             setTimeout(() => loader.remove(), 900);
           }, 400);
@@ -318,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const eased = 1 - Math.pow(1 - imgProgress, 3);
           
           // Y translation: gentler motion for a smoother, premium feel
-          const baseShift = 24;
+          const baseShift = 16;
           const currentY = baseShift * (1 - eased * tunedSpeed);
           
           // Scale: subtle reveal only
@@ -1227,57 +1251,6 @@ window.addEventListener('load', () => {
       ease: 'none',
       repeat: -1           // Infinite loop
     });
-  }
-
-  // ── CUSTOM GSAP CURSOR ──
-  const cursor = document.querySelector('.cursor');
-  const cursorBubble = document.querySelector('.cursor-bubble');
-  const arcSceneContainer = document.getElementById('arcScene');
-
-  if (cursor) {
-    // Force cursor to center of div
-    gsap.set(cursor, { xPercent: -50, yPercent: -50 });
-    
-    let pos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    let mouse = { x: pos.x, y: pos.y };
-    let speed = 0.35; // Follow speed
-    
-    window.addEventListener('mousemove', e => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    });
-    
-    gsap.ticker.add(() => {
-      const dt = 1.0 - Math.pow(1.0 - speed, gsap.ticker.deltaRatio());
-      pos.x += (mouse.x - pos.x) * dt;
-      pos.y += (mouse.y - pos.y) * dt;
-      gsap.set(cursor, { x: pos.x, y: pos.y });
-    });
-
-    // Hover interactions for the Arc Scene
-    if (arcSceneContainer) {
-      arcSceneContainer.addEventListener('mouseenter', () => {
-        cursor.classList.add('is-active');
-        if(cursorBubble) cursorBubble.innerHTML = 'Drag';
-      });
-      
-      arcSceneContainer.addEventListener('mouseleave', () => {
-        cursor.classList.remove('is-active');
-      });
-      
-      // Optional: change text when hovering a specific card inside the arc
-      const cards = arcSceneContainer.querySelectorAll('.a-card');
-      cards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-          if(cursorBubble) cursorBubble.innerHTML = 'View';
-          gsap.to(cursorBubble, { scale: 1.1, duration: 0.2 });
-        });
-        card.addEventListener('mouseleave', () => {
-          if(cursorBubble) cursorBubble.innerHTML = 'Drag';
-          gsap.to(cursorBubble, { scale: 1, duration: 0.2 });
-        });
-      });
-    }
   }
 
 });

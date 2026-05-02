@@ -11,6 +11,20 @@
   <meta property="og:image" content="https://blinkbeyond.co.in/assets/og-image.jpg">
   <meta property="og:url" content="https://blinkbeyond.co.in">
   <meta property="og:type" content="website">
+  <script>
+    (function() {
+      var seen = false;
+      try {
+        seen = localStorage.getItem('bb_loader_seen') === '1';
+      } catch (e) {}
+      if (!seen && /(?:^|; )bb_loader_seen=1/.test(document.cookie)) {
+        seen = true;
+      }
+      if (seen) {
+        document.documentElement.classList.add('bb-loader-skip');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -649,15 +663,6 @@
       </div>
     </div>
   </footer>
-
-  <!-- ═══════════════ CUSTOM CURSOR ═══════════════ -->
-  <div class="cursor">
-    <div class="cursor__drag-dots">
-      <div class="cursor__drag-dot"></div>
-      <div class="cursor__drag-dot"></div>
-    </div>
-    <div class="cursor-bubble"></div>
-  </div>
 
   <!-- GSAP + ScrollTrigger + Draggable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
