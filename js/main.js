@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sessionStorage.getItem('bb_loader_seen')) {
       loader.classList.add('skip');
     } else {
-      const percentEl = document.getElementById('loader-percent');
+      const counterEl = document.getElementById('loader-percent');
       const barFill = document.getElementById('loader-bar-fill');
       const fillText = document.getElementById('loader-fill-text');
       let current = 0;
@@ -26,13 +26,18 @@ document.addEventListener('DOMContentLoaded', () => {
           : 1 - Math.pow(-2 * progress + 2, 3) / 2;
         current = Math.floor(eased * 100);
 
-        if (percentEl) percentEl.textContent = current;
+        if (counterEl) {
+          const counterValue = current + '%';
+          counterEl.textContent = counterValue;
+          counterEl.dataset.value = counterValue;
+          counterEl.style.setProperty('--progress', current + '%');
+        }
         if (barFill) barFill.style.width = current + '%';
 
         // Progressive white fill inside the text
         if (fillText) {
           fillText.style.background = 
-            'linear-gradient(to right, #ffffff 0%, #ffffff ' + current + '%, transparent ' + current + '%)';
+            'linear-gradient(to right, #ffffff 0%, #ffffff ' + current + '%, rgba(255,255,255,0.24) ' + current + '%)';
           fillText.style.webkitBackgroundClip = 'text';
           fillText.style.backgroundClip = 'text';
           fillText.style.webkitTextFillColor = 'transparent';
@@ -185,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ScrollTrigger.create({
         trigger: heroPage,
         start: "top top",
-        end: "+=2200", // 2200px of scrolling for the expansion and viewing
+        end: () => `+=${Math.round(window.innerHeight * 1.0)}`, // balanced scroll distance for smooth animation
         pin: true,
         onUpdate: (self) => {
           scrollProg = self.progress;
@@ -303,6 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const imgs = section.querySelectorAll('.parallax-img');
         imgs.forEach((img, i) => {
           const speed = parseFloat(img.dataset.speed) || 0.6;
+          const tunedSpeed = Math.min(0.7, Math.max(0.35, speed * 0.6));
           
           // Stagger: each image starts slightly later (smaller gap for 6 images)
           const stagger = i * 0.05;
@@ -311,17 +317,20 @@ document.addEventListener('DOMContentLoaded', () => {
           // Ease function — ease-out cubic for smooth deceleration
           const eased = 1 - Math.pow(1 - imgProgress, 3);
           
-          // Y translation: from +100vh (below screen) to 0 (final position)
-          const currentY = 100 * (1 - eased * speed);
+          // Y translation: gentler motion for a smoother, premium feel
+          const baseShift = 24;
+          const currentY = baseShift * (1 - eased * tunedSpeed);
           
-          // Scale: from 0.6 to 1 — clean scaling without rotation
-          const scale = 0.6 + 0.4 * eased;
+          // Scale: subtle reveal only
+          const scale = 0.9 + 0.1 * eased;
           
-          // Opacity: fade in during first 30% of progress, then stay fully visible
-          const opacity = Math.min(1, imgProgress * 3.3);
+          // Opacity: softer fade in
+          const opacity = Math.min(0.85, imgProgress * 2.2);
+          const blur = (1 - eased) * 6;
           
           img.style.transform = `translateY(${currentY}vh) scale(${scale})`;
           img.style.opacity = opacity;
+          img.style.filter = `blur(${blur.toFixed(1)}px)`;
         });
       });
       
@@ -1292,13 +1301,13 @@ window.addEventListener('load', () => {
         // 1. Start flicker animation (CSS handles the keyframes)
         setTimeout(function() {
           lamp.classList.add('lamp-active');
-        }, 600); // 0.6s delay — starts in darkness
+        }, 200); // shorter delay so the effect starts quickly
 
         // 2. After flicker completes (~2.5s animation + 0.6s delay = 3.1s),
         //    reveal footer content
         setTimeout(function() {
           footer.classList.add('footer-revealed');
-        }, 3100);
+        }, 1200);
 
         observer.disconnect();
       }
