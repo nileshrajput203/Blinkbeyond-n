@@ -48,6 +48,10 @@ body {
   line-height: 1.6;
 }
 
+body.contact-page {
+  background: var(--dark-bg);
+}
+
 a {
   text-decoration: none;
   color: inherit;
@@ -2113,12 +2117,14 @@ select {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: clamp(40px, 5vw, 80px);
-  align-items: end;
+  align-items: stretch;
   min-height: 60vh;
 }
 
 .howwework-left {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .howwework-title {
@@ -2236,10 +2242,25 @@ select {
 .services-section {
   background: var(--black);
   padding: clamp(40px, 8vh, 100px) 0;
+  position: relative;
+}
+
+.services-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 260px;
+  background: linear-gradient(180deg, #050510 0%, rgba(5, 5, 16, 0.65) 55%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .services-section .container {
   max-width: 1200px;
+  position: relative;
+  z-index: 1;
 }
 
 /* Service block — alternating layout */
@@ -2744,7 +2765,7 @@ select {
   background-image:
     radial-gradient(ellipse at 20% 50%, rgba(61, 61, 255, 0.05) 0%, transparent 60%),
     radial-gradient(ellipse at 80% 80%, rgba(61, 61, 255, 0.03) 0%, transparent 50%);
-  padding: clamp(50px, 7vh, 100px) 0;
+  padding: calc(var(--nav-height) + clamp(40px, 6vh, 90px)) 0 clamp(50px, 7vh, 100px);
   min-height: 80vh;
   display: flex;
   align-items: center;
@@ -2763,6 +2784,7 @@ select {
   font-size: clamp(48px, 8vw, 110px);
   text-transform: uppercase;
   line-height: 0.95;
+  color: var(--white);
 }
 
 .contact-left h2 .blue {
@@ -3320,7 +3342,7 @@ select {
    ======================================== */
 .balloon-game-section {
   background: var(--black);
-  padding: clamp(40px, 5vh, 70px) 0;
+  padding: clamp(40px, 5vh, 70px) 0 0;
 }
 
 .balloon-game-header {
@@ -4041,7 +4063,7 @@ body::after {
 
 /* FIX 7 — SERVICES HEADER PAD */
 .page-header {
-  padding: clamp(40px, 6vh, 80px) 0 clamp(20px, 3vh, 40px) !important;
+  padding: calc(var(--nav-height) + clamp(40px, 5vh, 60px)) 0 clamp(30px, 4vh, 50px) !important;
 }
 
 /* FIX 8 — SERVICES CTA BANNER */
@@ -4250,11 +4272,9 @@ body::after {
    ══════════════════════════════════════════ */
 
 #ai-agent-btn {
-  position: fixed;
-  bottom: 25px;
-  left: 25px;
-  width: 55px;
-  height: 55px;
+  position: relative;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: #111111;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -4262,7 +4282,7 @@ body::after {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 9999;
+  z-index: 1;
   color: var(--white);
   transition: all 0.3s ease;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
